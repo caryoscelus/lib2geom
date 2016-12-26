@@ -41,8 +41,8 @@ bezier-to-sbasis.h
 bezier-utils.cpp
 bezier-utils.h
 
-cairo-path-sink.h
-cairo-path-sink.cpp
+#cairo-path-sink.h
+#cairo-path-sink.cpp
 choose.h
 circle.cpp
 circle.h
@@ -151,7 +151,12 @@ utils.h
 
 # make lib for 2geom
 ADD_LIBRARY(2geom ${LIB_TYPE} ${2GEOM_SRC})
-TARGET_LINK_LIBRARIES(2geom "${LINK_GSL} ${GTK2_LINK_FLAGS}" blas)
+
+find_package(Threads REQUIRED)
+include(FindPkgConfig)
+pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
+
+TARGET_LINK_LIBRARIES(2geom ${LINK_GSL} blas ${CMAKE_THREAD_LIBS_INIT} ${GLIBMM_LIBRARIES})
 SET_TARGET_PROPERTIES(2geom PROPERTIES SOVERSION "${2GEOM_ABI_VERSION}")
 INSTALL(TARGETS 2geom
   RUNTIME DESTINATION bin
