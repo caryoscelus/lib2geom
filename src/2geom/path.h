@@ -793,6 +793,8 @@ public:
         do_append(new CurveType(finalPoint(), a, b, c, d, e, f, g, h, i));
     }
 
+    std::vector<Path> subdivide(std::vector<PathTime> times_in);
+
     /** @brief Reduce the closing segment to a point if it's shorter than precision.
      * Do this by moving the final point. */
     void snapEnds(Coord precision = EPSILON);

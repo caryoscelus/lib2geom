@@ -527,9 +527,9 @@ public:
             for (std::size_t k = 0; k < cx.size(); ++k) {
                 PathTime tw(ii->index, cx[k].first), tow(i->index, cx[k].second);
                 _result.push_back(PathIntersection(
-                    w == 0 ? tw : tow,
-                    w == 0 ? tow : tw,
-                    cx[k].point()));
+                                      w == 0 ? tw : tow,
+                                      w == 0 ? tow : tw,
+                                      cx[k].point()));
             }
         }
     }
@@ -540,13 +540,13 @@ public:
 
 private:
     typedef boost::intrusive::list
-        < CurveRecord
-        , boost::intrusive::member_hook
-            < CurveRecord
-            , boost::intrusive::list_member_hook<>
-            , &CurveRecord::_hook
-            >
-        > ActiveCurveList;
+    < CurveRecord
+    , boost::intrusive::member_hook
+    < CurveRecord
+    , boost::intrusive::list_member_hook<>
+    , &CurveRecord::_hook
+    >
+    > ActiveCurveList;
 
     std::vector<CurveRecord> _records;
     std::vector<PathIntersection> &_result;
@@ -711,6 +711,48 @@ std::vector<Coord> Path::nearestTimePerCurve(Point const &p) const
         np.push_back(it->nearestTime(p));
     }
     return np;
+}
+
+std::vector<Path> Path::subdivide(std::vector<PathTime> times_in) {
+    std::vector<std::vector<double> > times(size());
+    for (size_t ii = 0; ii < times_in.size(); ++ii) {
+        size_t const current_index = times_in[ii].curve_index;
+        double const current_time = times_in[ii].t;
+        if (current_index > 1 + times.size()) {
+            throw std::runtime_error("Index out of range in Path::subdivide");
+        }
+        times[current_index].push_back(current_time);
+    }
+    for (size_t ii = 0; ii < times.size(); ++ii) {
+        std::vector<double>& current_vec = times[ii];
+        std::sort(current_vec.begin(), current_vec.end());
+        for (size_t jj = 0; jj < current_vec.size(); ++jj) {
+            double& t = current_vec[jj];
+            if (t < 0) {
+                t = 0;
+            }
+            else if (t > 1) {
+                t=1;
+            }
+        }
+    }
+    std::vector<Path> result;
+    result.push_back(Path());
+    Path &current_path = result.back();
+
+    for (size_t ii = 0; ii < times.size(); ++ii) {
+        if (times[ii].empty()) {
+            current_path.append(_data->curves[ii]);
+        }
+        else {
+            std::vector<double>& current_vec = times[ii];
+            for (size_t jj = 0; jj < current_vec.size(); ++jj) {
+                double const t = current_vec[jj];
+            }
+        }
+    }
+
+    return result;
 }
 
 PathTime Path::nearestTime(Point const &p, Coord *dist) const
@@ -1043,7 +1085,7 @@ void Path::do_append(Curve *c)
             THROW_CONTINUITYERROR();
         }
         if (_closed && c->isLineSegment() &&
-            c->finalPoint() == _closing_seg->finalPoint())
+                c->finalPoint() == _closing_seg->finalPoint())
         {
             // appending a curve that matches the closing segment has no effect
             delete c;
