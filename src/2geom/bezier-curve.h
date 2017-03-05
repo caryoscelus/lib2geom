@@ -277,6 +277,18 @@ public:
         return size() == 2;
     }
 
+    virtual bool isQuadraticBezier() const {
+        return size() == 3;
+    }
+
+    virtual bool isCubicBezier() const {
+        return size() == 4;
+    }
+
+    virtual bool isBezier() const {
+        return true;
+    }
+
     virtual Curve *duplicate() const {
         return new BezierCurveN(*this);
     }
