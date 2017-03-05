@@ -76,6 +76,7 @@ parametrics
 parser
 path-along-path
 path-effects
+path-subdivision
 pencil
 pencil-2
 plane3d

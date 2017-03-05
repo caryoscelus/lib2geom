@@ -209,7 +209,8 @@ public:
     }
 
 public:
-    BezierFitTester(){
+    BezierFitTester() {
+        first_time = true;
         for(int i = 0; i < SIZE; i++) {
             b_handle.push_back(150+uniform()*300,150+uniform()*300);
         }
@@ -230,7 +231,7 @@ public:
     }
 private:
     std::vector<Slider> sliders;
-    bool first_time = true;
+    bool first_time;
 };
 
 int main(int argc, char **argv) {
