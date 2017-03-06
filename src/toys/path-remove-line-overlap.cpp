@@ -103,7 +103,7 @@ Geom::Path subdivide(CubicBezier const& bez, std::vector<double> const& times_in
     return result;
 }
 
-#define SIZE 7
+#define SIZE 14
 
 class BezierFitTester: public Toy {
 public:
@@ -115,14 +115,6 @@ public:
         if (first_time)
         {
             first_time = false;
-            sliders[0].geometry(Point(50, 50), 100);
-            sliders[1].geometry(Point(50, 100), 100);
-            sliders[2].geometry(Point(50, 150), 100);
-        }
-
-        std::vector<PathTime> t_set;
-        for (size_t ii = 0; ii < 3; ++ii) {
-            t_set.push_back(sliders[ii].value());
         }
 
         Path original_path;
@@ -130,22 +122,27 @@ public:
         original_path.append(QuadraticBezier(b_handle.pts[3], b_handle.pts[4], b_handle.pts[5]));
         original_path.append(LineSegment(b_handle.pts[5], b_handle.pts[6]));
 
+        Path overlap_path;
+        overlap_path.append(CubicBezier(b_handle.pts[7], b_handle.pts[8], b_handle.pts[9], b_handle.pts[10]));
+        overlap_path.append(QuadraticBezier(b_handle.pts[10], b_handle.pts[11], b_handle.pts[12]));
+        overlap_path.append(LineSegment(b_handle.pts[12], b_handle.pts[13]));
+        overlap_path.close();
+
         cairo_set_line_width (cr, 2.);
         cairo_stroke(cr);
 
-        cairo_set_source_rgba (cr, 0., 0., .9, 1);
+        setRainbowColor(cr, 0);
         plot_bezier_with_handles(cr, original_path);
-        cairo_path(cr, original_path);
+
+        setRainbowColor(cr, 1);
+        plot_bezier_with_handles(cr, overlap_path);
 
         {
-            std::vector<Path> result = original_path.subdivide(t_set);
-            std::cerr << "Got " << result.size() << " sub-paths" << std::endl;
-            for (size_t ii = 0; ii < result.size(); ++ii) {
-                Path const& p = result[ii];
-                if (!p.empty()) {
-                    setRainbowColor(cr, ii);
-                    plot_bezier_with_handles(cr, p, Geom::Point(50, 350));
-                }
+            PathVector pieces = PathVector(original_path).removeLineOverlap(overlap_path);
+            size_t counter = 0;
+            for (PathVector::const_iterator it = pieces.begin(); it != pieces.end(); ++it) {
+                setRainbowColor(cr, counter++);
+                plot_bezier_with_handles(cr, *it, Point(0, 350));
             }
         }
 
@@ -161,23 +158,23 @@ public:
         for(int i = 0; i < SIZE; i++) {
             b_handle.push_back(150+uniform()*300,150+uniform()*300);
         }
-        b_handle.pts[0] = Geom::Point(70,250);
-        b_handle.pts[1] = Geom::Point(200,150);
-        b_handle.pts[2] = Geom::Point(200,350);
-        b_handle.pts[3] = Geom::Point(350,200);
-        b_handle.pts[4] = Geom::Point(450,100);
-        b_handle.pts[5] = Geom::Point(550,200);
-        b_handle.pts[6] = Geom::Point(650,200);
+        size_t index = 0;
+        b_handle.pts[index++] = Geom::Point(70,250);
+        b_handle.pts[index++] = Geom::Point(200,150);
+        b_handle.pts[index++] = Geom::Point(200,350);
+        b_handle.pts[index++] = Geom::Point(350,200);
+        b_handle.pts[index++] = Geom::Point(450,100);
+        b_handle.pts[index++] = Geom::Point(550,200);
+        b_handle.pts[index++] = Geom::Point(650,200);
+
+        b_handle.pts[index++] = Geom::Point(70,350);
+        b_handle.pts[index++] = Geom::Point(210,160);
+        b_handle.pts[index++] = Geom::Point(230,160);
+        b_handle.pts[index++] = Geom::Point(350,300);
+        b_handle.pts[index++] = Geom::Point(450,200);
+        b_handle.pts[index++] = Geom::Point(550,300);
+        b_handle.pts[index++] = Geom::Point(650,300);
         handles.push_back(&b_handle);
-        // M 70 250 C 860 766 200 350 350 200
-        // M 70 250 C 906 833 200 350 350 200
-        // M 70 250 C 800 738 200 350 350 200
-        sliders.push_back(Slider(0, 3, 0,  .3, "time 1"));
-        sliders.push_back(Slider(0, 3, 0, 1.5, "time 2"));
-        sliders.push_back(Slider(0, 3, 0, 2.7, "time 3"));
-        handles.push_back(&(sliders[0]));
-        handles.push_back(&(sliders[1]));
-        handles.push_back(&(sliders[2]));
     }
 private:
     std::vector<Slider> sliders;

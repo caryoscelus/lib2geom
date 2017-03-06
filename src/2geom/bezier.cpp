@@ -106,7 +106,7 @@ std::vector<Bezier> Bezier::subdivide(std::vector<Coord> times_in) const
     std::vector<double> times;
     for (size_t ii = 0; ii < times_in.size(); ++ii) {
         double const time = times_in[ii];
-        if (std::abs(last_time - time) > 1e-16 && time > 0 && time < 1) {
+        if (std::abs(last_time - time) > 1e-14 && time > 1e-14 && time < 1.-1e-14) {
             times.push_back(time);
             last_time = time;
         }
