@@ -135,6 +135,11 @@ struct PathTime
     PathTime() : t(0), curve_index(0) {}
     PathTime(size_type idx, Coord tval) : t(tval), curve_index(idx) {}
 
+    PathTime(Coord tval) {
+        t = fmod(tval, 1.0);
+        curve_index = static_cast<size_t>(tval);
+    }
+
     bool operator<(PathTime const &other) const {
         if (curve_index < other.curve_index) return true;
         if (curve_index == other.curve_index) {
@@ -792,6 +797,8 @@ public:
         _unshare();
         do_append(new CurveType(finalPoint(), a, b, c, d, e, f, g, h, i));
     }
+
+    std::vector<Path> subdivide(std::vector<PathTime> times_in);
 
     /** @brief Reduce the closing segment to a point if it's shorter than precision.
      * Do this by moving the final point. */

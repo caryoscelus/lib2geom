@@ -15,6 +15,7 @@ SET(2GEOM_TOYS-2_SRC
 aa
 arc-bez
 arc-length-param
+bezier-subdivision
 boolops-toy
 bound-path
 bounds-test
@@ -75,6 +76,7 @@ parametrics
 parser
 path-along-path
 path-effects
+path-subdivision
 pencil
 pencil-2
 plane3d
