@@ -733,7 +733,7 @@ void handle_subdivision_part(
         }
     }
 }
-}
+} // anonymous namespace
 
 std::vector<Path> Path::subdivide(std::vector<PathTime> times_in) {
     std::vector<std::vector<Coord> > times(size());
