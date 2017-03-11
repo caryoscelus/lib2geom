@@ -76,6 +76,7 @@ parametrics
 parser
 path-along-path
 path-effects
+path-remove-line-overlap
 path-subdivision
 pencil
 pencil-2

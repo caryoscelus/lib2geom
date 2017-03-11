@@ -574,6 +574,8 @@ public:
      * considered to be inside the path. */
     int winding(Point const &p) const;
 
+    PathVector removeLineOverlap(PathVector const& other) const;
+
     std::vector<Coord> allNearestTimes(Point const &p, Coord from, Coord to) const;
     std::vector<Coord> allNearestTimes(Point const &p) const {
         return allNearestTimes(p, 0, size_default());
@@ -798,7 +800,7 @@ public:
         do_append(new CurveType(finalPoint(), a, b, c, d, e, f, g, h, i));
     }
 
-    std::vector<Path> subdivide(std::vector<PathTime> times_in);
+    std::vector<Path> subdivide(std::vector<PathTime> times_in) const;
 
     /** @brief Reduce the closing segment to a point if it's shorter than precision.
      * Do this by moving the final point. */

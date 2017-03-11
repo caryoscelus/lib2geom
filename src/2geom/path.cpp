@@ -618,6 +618,31 @@ int Path::winding(Point const &p) const {
     return wind;
 }
 
+PathVector Path::removeLineOverlap(PathVector const& other) const {
+    PathVector result;
+    std::vector<PathTime> intersections;
+    for (PathVector::const_iterator it = other.begin(); it != other.end(); ++it) {
+        std::vector<Intersection<PathTime> > current_intersections = intersect(*it);
+        intersections.reserve(intersections.size() + current_intersections.size());
+        for (size_t ii = 0; ii < current_intersections.size(); ++ii) {
+            intersections.push_back(current_intersections[ii].first);
+        }
+    }
+    std::vector<Path> pieces = subdivide(intersections);
+
+    for (std::vector<Path>::iterator it = pieces.begin(); it != pieces.end(); ++it) {
+        if (!it->empty()) {
+            Point p = it[0].pointAt(.5);
+            int winding = other.winding(p);
+            if (winding % 2 == 0) {
+                result.push_back(*it);
+            }
+        }
+    }
+
+    return result;
+}
+
 std::vector<double> Path::allNearestTimes(Point const &_point, double from, double to) const
 {
     // TODO from and to are not used anywhere.
@@ -735,7 +760,7 @@ void handle_subdivision_part(
 }
 } // anonymous namespace
 
-std::vector<Path> Path::subdivide(std::vector<PathTime> times_in) {
+std::vector<Path> Path::subdivide(std::vector<PathTime> times_in) const {
     std::vector<std::vector<Coord> > times(size());
     for (size_t ii = 0; ii < times_in.size(); ++ii) {
         size_t const current_index = times_in[ii].curve_index;
